@@ -1,0 +1,35 @@
+{
+  "name": "print-shop-admin",
+  "version": "1.0.0",
+  "description": "Sistema Administrativo para Imprenta Digital",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.2",
+    "chart.js": "^3.9.1",
+    "connect-flash": "^0.1.1",
+    "dotenv": "^17.0.0",
+    "ejs": "^3.1.10",
+    "exceljs": "^4.4.0",
+    "express": "^4.21.2",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.18.1",
+    "express-validator": "^6.15.0",
+    "method-override": "^3.0.0",
+    "mysql2": "^3.14.1",
+    "nodemon": "^3.1.10",
+    "pdfkit": "^0.12.3",
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^4.1.8"
+  }
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cierres de Caja</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body class="p-4">
+  <h1>Cierres de Caja</h1>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Usuario</th>
+        <th>Total Ingresos</th>
+        <th>Total Gastos</th>
+        <th>Saldo Final</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% cierres.forEach(cierre => { %>
+        <tr>
+          <td><%= new Date(cierre.fecha).toLocaleDateString() %></td>
+          <td><%= cierre.usuario ? cierre.usuario.nombre_completo : 'Desconocido' %></td>
+          <td>RD$ <%= cierre.total_ingresos %></td>
+          <td>RD$ <%= cierre.total_gastos %></td>
+          <td>RD$ <%= cierre.saldo_final %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>

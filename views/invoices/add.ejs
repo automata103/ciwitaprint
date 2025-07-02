@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CiwitaPrint | Crear Factura</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #4f46e5;
+      --primary-hover: #4338ca;
+      --secondary-color: #f9fafb;
+      --text-color: #374151;
+      --text-light: #6b7280;
+      --border-color: #e5e7eb;
+      --success-color: #10b981;
+      --danger-color: #ef4444;
+    }
+    
+    body {
+      background-color: var(--secondary-color);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text-color);
+    }
+    
+    .card {
+      border: none;
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    
+    .card-header {
+      background-color: white;
+      border-bottom: 1px solid var(--border-color);
+      padding: 1.25rem 1.5rem;
+    }
+    
+    .form-label {
+      font-weight: 500;
+      color: var(--text-color);
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.75rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.1);
+    }
+    
+    .product-row {
+      background-color: white;
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+      border: 1px solid var(--border-color);
+    }
+    
+    .total-display {
+      background-color: rgba(79, 70, 229, 0.03);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      border: 1px solid var(--border-color);
+    }
+    
+    .total-label {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    
+    .total-value {
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      border-color: var(--primary-hover);
+    }
+    
+    .btn-outline-danger {
+      color: var(--danger-color);
+      border-color: var(--danger-color);
+    }
+    
+    .btn-outline-danger:hover {
+      background-color: var(--danger-color);
+      color: white;
+    }
+    
+    .btn-outline-secondary {
+      border-color: var(--border-color);
+    }
+    
+    .amount-input {
+      font-family: 'Roboto Mono', monospace;
+      text-align: right;
+    }
+    
+    .readonly-input {
+      background-color: var(--secondary-color);
+    }
+    
+    .section-title {
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+    <div class="card">
+      <div class="card-header">
+        <h1 class="h4 mb-0 fw-semibold">
+          <i class="bi bi-file-earmark-text me-2"></i>Crear Factura
+        </h1>
+      </div>
+      
+      <div class="card-body">
+        <form action="/invoices/add" method="POST">
+          <!-- Sección Cliente -->
+          <div class="mb-4">
+            <h5 class="section-title">Información del Cliente</h5>
+            <div class="form-group mb-3">
+              <label for="customerId" class="form-label">Cliente</label>
+              <select class="form-select" id="customerId" name="customerId" required>
+                <% customers.forEach(customer => { %>
+                  <option value="<%= customer.id %>"><%= customer.name %></option>
+                <% }); %>
+              </select>
+            </div>
+          </div>
+
+          <!-- Sección Productos -->
+          <div class="mb-4">
+            <h5 class="section-title">Productos/Servicios</h5>
+            <div id="product-container">
+              <div class="product-row row g-3 align-items-center">
+                <div class="col-md-4">
+                  <label class="form-label visually-hidden">Producto</label>
+                  <select class="form-select product-select" name="products[0][id]" required>
+                    <% products.forEach(product => { %>
+                      <option value="<%= product.id %>" data-price="<%= product.price %>"><%= product.name %></option>
+                    <% }); %>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label visually-hidden">Cantidad</label>
+                  <input type="number" class="form-control product-quantity" name="products[0][quantity]" value="1" min="1" required>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label visually-hidden">Precio</label>
+                  <input type="number" step="0.01" class="form-control product-price amount-input readonly-input" name="products[0][price]" readonly>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label visually-hidden">Total</label>
+                  <input type="number" step="0.01" class="form-control product-total amount-input readonly-input" readonly>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                  <button type="button" class="btn btn-outline-danger remove-product w-100">
+                    <i class="bi bi-trash"></i> Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+            <button type="button" id="add-product" class="btn btn-outline-secondary mt-2">
+              <i class="bi bi-plus-circle"></i> Agregar Producto
+            </button>
+          </div>
+
+          <!-- Sección Detalles Adicionales -->
+          <div class="mb-4">
+            <h5 class="section-title">Detalles Adicionales</h5>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="productRoa" class="form-label">Mano de Obra (ROA)</label>
+                  <input type="number" step="0.01" class="form-control amount-input" id="productRoa" name="productRoa" value="0">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="discount" class="form-label">Descuento</label>
+                  <input type="number" step="0.01" class="form-control amount-input" id="discount" name="discount" value="0">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="fiscalReceipt" class="form-label">Comprobante Fiscal</label>
+                  <select class="form-select" id="fiscalReceipt" name="fiscalReceipt">
+                    <option value="false">No</option>
+                    <option value="true">Sí</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-group">
+                  <label for="comments" class="form-label">Comentarios</label>
+                  <textarea class="form-control" id="comments" name="comments" rows="2"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sección Totales -->
+          <div class="mb-4">
+            <h5 class="section-title">Resumen de Factura</h5>
+            <div class="total-display">
+              <div class="row mb-2">
+                <div class="col-6 total-label">Subtotal:</div>
+                <div class="col-6 text-end total-value" id="subtotal-display">RD$ 0.00</div>
+                <input type="hidden" id="subtotal" name="subtotal">
+              </div>
+              <div class="row mb-2">
+                <div class="col-6 total-label">ITBIS (18%):</div>
+                <div class="col-6 text-end total-value" id="itbis-display">RD$ 0.00</div>
+                <input type="hidden" id="itbis" name="itbis">
+              </div>
+              <div class="row mb-2">
+                <div class="col-6 total-label">Mano de Obra:</div>
+                <div class="col-6 text-end total-value" id="roa-display">RD$ 0.00</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-6 total-label">Descuento:</div>
+                <div class="col-6 text-end total-value text-danger" id="discount-display">- RD$ 0.00</div>
+              </div>
+              <div class="row mt-3 pt-2 border-top">
+                <div class="col-6 total-label">Total:</div>
+                <div class="col-6 text-end">
+                  <span class="h5 fw-bold total-value" id="total-display">RD$ 0.00</span>
+                </div>
+                <input type="hidden" id="total" name="total">
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <a href="/invoices" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left"></i> Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save"></i> Guardar Factura
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const productContainer = document.getElementById('product-container');
+      const addProductBtn = document.getElementById('add-product');
+      let productIndex = 1;
+
+      function formatCurrency(amount) {
+        return new Intl.NumberFormat('es-DO', {
+          style: 'currency',
+          currency: 'DOP'
+        }).format(amount);
+      }
+
+      function updateTotals() {
+        let subtotal = 0;
+        document.querySelectorAll('.product-row').forEach(row => {
+          const quantity = parseFloat(row.querySelector('.product-quantity').value) || 0;
+          const select = row.querySelector('.product-select');
+          const price = parseFloat(select.options[select.selectedIndex].dataset.price) || 0;
+          const priceField = row.querySelector('.product-price');
+          const totalField = row.querySelector('.product-total');
+
+          priceField.value = price.toFixed(2);
+          const productTotal = quantity * price;
+          totalField.value = productTotal.toFixed(2);
+          subtotal += productTotal;
+        });
+
+        const productRoa = parseFloat(document.getElementById('productRoa').value) || 0;
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
+        const fiscalReceipt = document.getElementById('fiscalReceipt').value === 'true';
+        const itbis = fiscalReceipt ? subtotal * 0.18 : 0;
+        const total = subtotal + productRoa - discount + itbis;
+
+        // Actualizar campos ocultos para el formulario
+        document.getElementById('subtotal').value = subtotal.toFixed(2);
+        document.getElementById('itbis').value = itbis.toFixed(2);
+        document.getElementById('total').value = total.toFixed(2);
+        
+        // Actualizar display visual
+        document.getElementById('subtotal-display').textContent = formatCurrency(subtotal);
+        document.getElementById('itbis-display').textContent = formatCurrency(itbis);
+        document.getElementById('roa-display').textContent = formatCurrency(productRoa);
+        document.getElementById('discount-display').textContent = `- ${formatCurrency(discount)}`;
+        document.getElementById('total-display').textContent = formatCurrency(total);
+      }
+
+      function addProductRow() {
+        const newRow = document.createElement('div');
+        newRow.className = 'product-row row g-3 align-items-center';
+        newRow.innerHTML = `
+          <div class="col-md-4">
+            <label class="form-label visually-hidden">Producto</label>
+            <select class="form-select product-select" name="products[${productIndex}][id]" required>
+              <% products.forEach(product => { %>
+                <option value="<%= product.id %>" data-price="<%= product.price %>"><%= product.name %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label visually-hidden">Cantidad</label>
+            <input type="number" class="form-control product-quantity" name="products[${productIndex}][quantity]" value="1" min="1" required>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label visually-hidden">Precio</label>
+            <input type="number" step="0.01" class="form-control product-price amount-input readonly-input" name="products[${productIndex}][price]" readonly>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label visually-hidden">Total</label>
+            <input type="number" step="0.01" class="form-control product-total amount-input readonly-input" readonly>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="button" class="btn btn-outline-danger remove-product w-100">
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
+          </div>
+        `;
+        productIndex++;
+        productContainer.appendChild(newRow);
+        attachEvents(newRow);
+        updateTotals();
+      }
+
+      function attachEvents(row) {
+        row.querySelector('.product-select').addEventListener('change', updateTotals);
+        row.querySelector('.product-quantity').addEventListener('input', updateTotals);
+        row.querySelector('.remove-product').addEventListener('click', () => {
+          row.remove();
+          updateTotals();
+        });
+      }
+
+      // Inicializar eventos
+      document.querySelectorAll('.product-row').forEach(attachEvents);
+      document.getElementById('productRoa').addEventListener('input', updateTotals);
+      document.getElementById('discount').addEventListener('input', updateTotals);
+      document.getElementById('fiscalReceipt').addEventListener('change', updateTotals);
+      addProductBtn.addEventListener('click', addProductRow);
+      
+      // Inicializar valores
+      updateTotals();
+    });
+  </script>
+</body>
+</html>
