@@ -1,0 +1,236 @@
+<!-- views/customers/add.ejs -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuevo Cliente | Sistema de Gestión</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --primary-color: #4e73df;
+      --primary-hover: #2e59d9;
+      --secondary-color: #f8f9fc;
+      --text-color: #5a5c69;
+    }
+    
+    body {
+      background-color: var(--secondary-color);
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    .form-container {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+      padding: 2rem;
+    }
+    
+    .form-header {
+      border-bottom: 1px solid #e3e6f0;
+      padding-bottom: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .form-title {
+      color: var(--primary-color);
+      font-weight: 700;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: var(--text-color);
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+      border-radius: 0.35rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d3e2;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .info-card {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+      height: 100%;
+      padding: 2rem;
+    }
+    
+    .info-title {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+    
+    .info-list {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    
+    .info-list li {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #e3e6f0;
+      display: flex;
+      align-items: flex-start;
+    }
+    
+    .info-list li:last-child {
+      border-bottom: none;
+    }
+    
+    .info-icon {
+      color: var(--primary-color);
+      margin-right: 1rem;
+      font-size: 1.25rem;
+    }
+    
+    .required-field::after {
+      content: " *";
+      color: #e74a3b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-xl-10">
+        <div class="row g-5">
+          <!-- Formulario -->
+          <div class="col-lg-7">
+            <div class="form-container">
+              <div class="form-header">
+                <h2 class="form-title">
+                  <i class="bi bi-person-plus me-2"></i>Nuevo Cliente
+                </h2>
+                <p class="text-muted mb-0">Complete todos los campos requeridos para registrar un nuevo cliente</p>
+              </div>
+              
+              <form action="/customers/add" method="POST">
+                <div class="mb-4">
+                  <label for="name" class="form-label required-field">Nombre completo</label>
+                  <input type="text" class="form-control" id="name" name="name" placeholder="Ej: María García López" required>
+                </div>
+                
+                <div class="row g-3 mb-4">
+                  <div class="col-md-6">
+                    <label for="email" class="form-label">Correo electrónico</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                      <input type="email" class="form-control" id="email" name="email" placeholder="cliente@ejemplo.com">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="phone" class="form-label">Teléfono</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                      <input type="text" class="form-control" id="phone" name="phone" placeholder="809-555-1234">
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="mb-4">
+                  <label for="type" class="form-label">Tipo de cliente</label>
+                  <select class="form-select" id="type" name="type">
+                    <option value="" selected disabled>Seleccione un tipo</option>
+                    <option value="Frecuente">Frecuente</option>
+                    <option value="Ocasional">Ocasional</option>
+                    <option value="Empresa">Empresa</option>
+                    <option value="VIP">VIP</option>
+                  </select>
+                </div>
+                
+                <div class="mb-4">
+                  <label for="address" class="form-label">Dirección</label>
+                  <textarea class="form-control" id="address" name="address" rows="3" placeholder="Calle, número, sector, ciudad..."></textarea>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-5">
+                  <a href="/customers" class="btn btn-outline-secondary me-md-2">
+                    <i class="bi bi-arrow-left me-1"></i> Cancelar
+                  </a>
+                  <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save me-1"></i> Guardar Cliente
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+          
+          <!-- Panel de información -->
+          <div class="col-lg-5">
+            <div class="info-card">
+              <h3 class="info-title">
+                <i class="bi bi-info-circle me-2"></i>Instrucciones
+              </h3>
+              
+              <ul class="info-list">
+                <li>
+                  <span class="info-icon"><i class="bi bi-person"></i></span>
+                  <div>
+                    <h6 class="fw-bold mb-1">Nombre completo</h6>
+                    <p class="small text-muted mb-0">Ingrese el nombre completo del cliente como aparece en su identificación.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="info-icon"><i class="bi bi-envelope"></i></span>
+                  <div>
+                    <h6 class="fw-bold mb-1">Correo electrónico</h6>
+                    <p class="small text-muted mb-0">Asegúrese de que el correo esté escrito correctamente para futuras comunicaciones.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="info-icon"><i class="bi bi-telephone"></i></span>
+                  <div>
+                    <h6 class="fw-bold mb-1">Teléfono</h6>
+                    <p class="small text-muted mb-0">Formato recomendado: 809-555-1234. Incluya código de área si aplica.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="info-icon"><i class="bi bi-tag"></i></span>
+                  <div>
+                    <h6 class="fw-bold mb-1">Tipo de cliente</h6>
+                    <p class="small text-muted mb-0">Seleccione la categoría que mejor describa la relación comercial con el cliente.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="info-icon"><i class="bi bi-geo-alt"></i></span>
+                  <div>
+                    <h6 class="fw-bold mb-1">Dirección</h6>
+                    <p class="small text-muted mb-0">Incluya detalles suficientes para ubicación física (calle, número, sector, ciudad).</p>
+                  </div>
+                </li>
+              </ul>
+              
+              <div class="alert alert-primary mt-4">
+                <i class="bi bi-exclamation-circle-fill me-2"></i>
+                Los campos marcados con <span class="fw-bold">*</span> son obligatorios para el registro.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

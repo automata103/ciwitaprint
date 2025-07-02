@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Productos | CiwitaPrint</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #04404b;
+      --secondary-color: #0a7e8c;
+      --accent-color: #f8b400;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+    }
+    
+    .navbar {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .navbar-brand {
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    .nav-link {
+      color: rgba(255,255,255,0.85) !important;
+      transition: all 0.3s ease;
+      margin: 0 5px;
+      border-radius: 4px;
+      padding: 8px 15px !important;
+    }
+    
+    .nav-link:hover, .nav-link.active {
+      color: white !important;
+      background-color: rgba(255,255,255,0.15);
+    }
+    
+    .nav-link i {
+      margin-right: 8px;
+    }
+    
+    .page-header {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+    }
+    
+    .btn-primary-custom {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      border: none;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary-custom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .table-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 20px;
+      overflow-x: auto;
+    }
+    
+    .table {
+      margin-bottom: 0;
+    }
+    
+    .table th {
+      background-color: #f5f7fa;
+      color: var(--primary-color);
+      font-weight: 600;
+      border-top: none;
+    }
+    
+    .table-hover tbody tr:hover {
+      background-color: rgba(10, 126, 140, 0.05);
+    }
+    
+    .badge-category {
+      background-color: #e3f2fd;
+      color: #1976d2;
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+    
+    .badge-stock {
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+    
+    .stock-high {
+      background-color: #e6f7ee;
+      color: #2e7d32;
+    }
+    
+    .stock-medium {
+      background-color: #fff8e1;
+      color: #ff8f00;
+    }
+    
+    .stock-low {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+    
+    .action-btn {
+      padding: 5px 12px;
+      font-size: 13px;
+      border-radius: 4px;
+      margin: 0 3px;
+    }
+    
+    .search-box {
+      position: relative;
+      max-width: 300px;
+    }
+    
+    .search-box input {
+      padding-left: 35px;
+      border-radius: 20px;
+    }
+    
+    .search-box i {
+      position: absolute;
+      left: 13px;
+      top: 10px;
+      color: #6c757d;
+    }
+    
+    .pagination .page-item.active .page-link {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .pagination .page-link {
+      color: var(--primary-color);
+    }
+  </style>
+</head>
+<body>
+
+
+  <!-- Contenido principal -->
+  <div class="container py-4">
+    <!-- Encabezado -->
+    <div class="page-header">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h1 class="mb-0">
+            <i class="fas fa-boxes text-primary me-2"></i>Gestión de Productos
+          </h1>
+          <p class="text-muted mb-0">Administra el inventario de productos</p>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+          <a href="/products/add" class="btn btn-primary-custom text-white">
+            <i class="fas fa-plus-circle me-2"></i>Agregar Producto
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros y búsqueda -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" class="form-control" placeholder="Buscar productos...">
+        </div>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <div class="btn-group">
+          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="fas fa-filter me-1"></i>Filtrar
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#">Todos</a></li>
+            <li><a class="dropdown-item" href="#">Con stock</a></li>
+            <li><a class="dropdown-item" href="#">Sin stock</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Por categoría</a></li>
+          </ul>
+        </div>
+        <div class="btn-group ms-2">
+          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="fas fa-sort me-1"></i>Ordenar
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#">Nombre (A-Z)</a></li>
+            <li><a class="dropdown-item" href="#">Nombre (Z-A)</a></li>
+            <li><a class="dropdown-item" href="#">Precio (Mayor a menor)</a></li>
+            <li><a class="dropdown-item" href="#">Precio (Menor a mayor)</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de productos -->
+    <div class="table-container">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Materia</th>
+              <th>Tamaño</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Descripción</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% products.forEach(product => { 
+              let stockClass = 'stock-high';
+              if(product.stock < 10) stockClass = 'stock-low';
+              else if(product.stock < 20) stockClass = 'stock-medium';
+            %>
+              <tr>
+                <td class="fw-semibold"><%= product.name %></td>
+                <td><%= product.type %></td>
+                <td><%= product.size %></td>
+                <td>RD$ <%= parseFloat(product.price).toFixed(2) %></td>
+                <td>
+                  <span class="badge badge-stock <%= stockClass %>">
+                    <%= product.stock %> unidades
+                  </span>
+                </td>
+                <td>
+                  <span class="badge-category"><%= product.category %></span>
+                </td>
+                <td class="text-end">
+                  <a href="/products/edit/<%= product.id %>" class="btn btn-sm btn-warning action-btn">
+                    <i class="fas fa-edit me-1"></i>Editar
+                  </a>
+                  <a href="/products/delete/<%= product.id %>" class="btn btn-sm btn-danger action-btn">
+                    <i class="fas fa-trash-alt me-1"></i>Eliminar
+                  </a>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+          </li>
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item">
+            <a class="page-link" href="#">Siguiente</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Funcionalidad de búsqueda
+    document.querySelector('.search-box input').addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      document.querySelectorAll('tbody tr').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

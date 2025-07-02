@@ -1,0 +1,153 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-lg">
+        <div class="card-header bg-gradient-primary text-white py-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">
+              <i class="fas fa-receipt me-2"></i>Procesar Pago - Factura #<%= invoice.id %>
+            </h3>
+            <span class="badge bg-light text-primary fs-6">Total: $<%= invoice.total_amount %></span>
+          </div>
+        </div>
+        
+        <div class="card-body p-4">
+          <form action="/invoices/<%= invoice.id %>/process-payment" method="POST" class="needs-validation" novalidate>
+            <!-- Monto a Pagar -->
+            <div class="mb-4">
+              <label for="amount" class="form-label fw-bold">
+                <i class="fas fa-money-bill-wave me-2"></i>Monto a pagar
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-light">$</span>
+                <input type="number" 
+                       class="form-control form-control-lg" 
+                       name="amount" 
+                       id="amount" 
+                       step="0.01" 
+                       min="0" 
+                       max="<%= invoice.total_amount %>" 
+                       placeholder="Ingrese el monto" 
+                       required>
+              </div>
+              <div class="form-text text-muted">Saldo pendiente: $<%= invoice.balance_due %></div>
+            </div>
+
+            <!-- Método de Pago -->
+            <div class="mb-4">
+              <label for="paymentMethod" class="form-label fw-bold">
+                <i class="fas fa-credit-card me-2"></i>Método de pago
+              </label>
+              <select class="form-select form-select-lg" 
+                      name="paymentMethod" 
+                      id="paymentMethod" 
+                      required>
+                <option value="" disabled selected>Seleccione un método...</option>
+                <option value="Efectivo">
+                  <i class="fas fa-money-bill"></i> Efectivo
+                </option>
+                <option value="Tarjeta">
+                  <i class="fas fa-credit-card"></i> Tarjeta
+                </option>
+                <option value="Transferencia">
+                  <i class="fas fa-exchange-alt"></i> Transferencia
+                </option>
+              </select>
+            </div>
+
+            <!-- Detalles Adicionales -->
+            <div class="mb-4" id="paymentDetailsContainer" style="display: none;">
+              <label class="form-label fw-bold">
+                <i class="fas fa-info-circle me-2"></i>Detalles adicionales
+              </label>
+              <div id="cashDetails" class="payment-details">
+                <input type="text" class="form-control mb-2" placeholder="Monto recibido">
+                <input type="text" class="form-control" placeholder="Cambio a devolver" disabled>
+              </div>
+              <div id="cardDetails" class="payment-details">
+                <input type="text" class="form-control mb-2" placeholder="Últimos 4 dígitos">
+                <input type="text" class="form-control" placeholder="Código de autorización">
+              </div>
+              <div id="transferDetails" class="payment-details">
+                <input type="text" class="form-control" placeholder="Número de referencia">
+              </div>
+            </div>
+
+            <!-- Botón de Envío -->
+            <div class="d-grid gap-2 mt-4">
+              <button type="submit" class="btn btn-success btn-lg py-3">
+                <i class="fas fa-check-circle me-2"></i>Confirmar Pago
+              </button>
+              <a href="/invoices" class="btn btn-outline-secondary">
+                <i class="fas fa-times me-2"></i>Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+        
+        <div class="card-footer bg-light py-3">
+          <small class="text-muted">
+            <i class="fas fa-lock me-2"></i>Transacción segura - Todos los pagos son verificados
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Script para mostrar detalles según método de pago -->
+<script>
+  document.getElementById('paymentMethod').addEventListener('change', function() {
+    const container = document.getElementById('paymentDetailsContainer');
+    const method = this.value;
+    
+    // Ocultar todos los detalles primero
+    document.querySelectorAll('.payment-details').forEach(el => {
+      el.style.display = 'none';
+    });
+    
+    if (method) {
+      container.style.display = 'block';
+      document.getElementById(method.toLowerCase() + 'Details').style.display = 'block';
+    } else {
+      container.style.display = 'none';
+    }
+  });
+</script>
+
+<!-- Estilos adicionales -->
+<style>
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+  }
+  
+  .card {
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  
+  .form-control, .form-select {
+    border-radius: 0.35rem;
+    padding: 0.75rem 1rem;
+  }
+  
+  .btn-success {
+    background-color: #28a745;
+    border: none;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .payment-details {
+    display: none;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.35rem;
+    margin-top: 0.5rem;
+  }
+</style>
