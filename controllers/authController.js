@@ -4,7 +4,14 @@ const User = require('../models/User');
 
 module.exports = {
   showLoginForm: (req, res) => {
-    res.render('auth/login', { layout: false });
+    // Pasar las alertas a la vista aunque no use layout
+    const alerts = req.session.alerts || [];
+    req.session.alerts = [];
+    
+    res.render('auth/login', { 
+      layout: false,
+      alerts
+    });
   },
 
   login: async (req, res) => {
@@ -14,7 +21,12 @@ module.exports = {
 
       if (!user) {
         console.log('Usuario no encontrado para el username:', username);
-        res.alertSwette('error', 'Nombre de usuario o contraseña incorrectos', 'Error de autenticación');
+        req.session.alerts = [{
+          type: 'error',
+          message: 'Nombre de usuario o contraseña incorrectos',
+          title: 'Error de autenticación',
+          icon: 'person-x-fill'
+        }];
         return res.redirect('/login');
       }
 
@@ -22,7 +34,12 @@ module.exports = {
 
       if (!isPasswordValid) {
         console.log('Contraseña incorrecta para el usuario:', username);
-        res.alertSwette('error', 'Nombre de usuario o contraseña incorrectos', 'Error de autenticación');
+        req.session.alerts = [{
+          type: 'error',
+          message: 'Nombre de usuario o contraseña incorrectos',
+          title: 'Error de autenticación',
+          icon: 'key-fill'
+        }];
         return res.redirect('/login');
       }
 
@@ -33,12 +50,24 @@ module.exports = {
         role: user.role
       };
 
-      res.alertSwette('success', `Bienvenido ${user.nombre_completo}`, 'Inicio de sesión exitoso');
-      res.redirect('/dashboard');
+      // Redirigir al dashboard con alerta de éxito
+      req.session.alerts = [{
+        type: 'success',
+        message: `Bienvenido ${user.nombre_completo}`,
+        title: 'Inicio de sesión exitoso',
+        icon: 'person-check-fill',
+        timeout: 3000
+      }];
+      return res.redirect('/dashboard');
     } catch (error) {
       console.error('Error en el controlador de login:', error);
-      res.alertSwette('error', 'Error al iniciar sesión', 'Error del sistema');
-      res.redirect('/login');
+      req.session.alerts = [{
+        type: 'error',
+        message: 'Error al iniciar sesión',
+        title: 'Error del sistema',
+        icon: 'bug-fill'
+      }];
+      return res.redirect('/login');
     }
   },
 
@@ -46,11 +75,20 @@ module.exports = {
     req.session.destroy(err => {
       if (err) {
         console.error(err);
-        res.alertSwette('error', 'Error al cerrar sesión', 'Error del sistema');
+        req.session.alerts = [{
+          type: 'error',
+          message: 'Error al cerrar sesión',
+          title: 'Error del sistema'
+        }];
         return res.redirect('/dashboard');
       }
-      res.alertSwette('info', 'Has cerrado sesión correctamente', 'Sesión finalizada');
-      res.redirect('/login');
+      // Crear nueva sesión solo para la alerta
+      req.session.alerts = [{
+        type: 'info',
+        message: 'Has cerrado sesión correctamente',
+        title: 'Sesión finalizada'
+      }];
+      return res.redirect('/login');
     });
   }
 };
