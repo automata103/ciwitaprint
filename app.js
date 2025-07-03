@@ -8,7 +8,7 @@ const sequelize = require('./config/database');
 const expressLayouts = require('express-ejs-layouts');
 const User = require('./models/User'); // Asegúrate de importar tus modelos
 const Customer  = require('./models/Customer');
-const alertMiddleware = require('./middlewares/alertMiddleware');
+const alertMiddleware = require('./middleware/alertMiddleware'); // Importa el middleware de alertas
 
 // Sincroniza los modelos con la base de datos
 sequelize.sync({ force: false }) // Cambia `force: true` si quieres que se recreen las tablas
