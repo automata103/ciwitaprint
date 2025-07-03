@@ -2,8 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const PostgreSQLStore = require('connect-pg-simple')(session);
-const app = express();
 const path = require('path');
+const app = express();
 const sequelize = require('./config/database');
 const expressLayouts = require('express-ejs-layouts');
 
@@ -11,31 +11,35 @@ const expressLayouts = require('express-ejs-layouts');
 const { ensureAuthenticated } = require('./middleware/auth');
 const alertMiddleware = require('./middleware/alertMiddleware');
 
-// Configuración básica de Express
+// Middlewares base
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configuración de EJS y layouts
+// EJS y Layouts
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(expressLayouts);
 app.set('layout', 'layouts/layout');
 
-// Configuración de sesión para producción/desarrollo
+// --- SESIONES ---
 const sessionConfig = {
   store: new PostgreSQLStore({
-    conString: process.env.DATABASE_URL,
+    conString: process.env.DATABASE_URL || 
+      `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
     createTableIfMissing: true,
-    pruneSessionInterval: 60 * 60 // Limpiar sesiones cada hora
+    pruneSessionInterval: 60 * 60, // Limpiar sesiones cada hora
+    ssl: {
+      rejectUnauthorized: false
+    }
   }),
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 * 1000, // 1 día
-    httpOnly: true
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 1 día
   }
 };
 
@@ -46,34 +50,30 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use(session(sessionConfig));
 
-// Middlewares personalizados
+// --- Middleware Global ---
 app.use(alertMiddleware);
+
 app.use((req, res, next) => {
-  // Pasar datos comunes a todas las vistas
   res.locals.user = req.session.user || null;
   res.locals.currentPath = req.path;
   res.locals.alerts = req.session.alerts || [];
-  req.session.alerts = []; // Limpiar alertas después de pasarlas
-  
-  // Continuar con la cadena de middlewares
+  req.session.alerts = []; // Limpiar alertas
   next();
 });
 
-// Sincronización de modelos con la base de datos
-sequelize.sync({ 
-  force: process.env.FORCE_SYNC === 'true' // Solo para desarrollo
-})
-.then(() => {
-  console.log('✅ Modelos sincronizados con la base de datos');
-  if (process.env.FORCE_SYNC === 'true') {
-    console.log('⚠️  ¡FORCE_SYNC está activado! Las tablas fueron recreadas');
-  }
-})
-.catch(err => {
-  console.error('❌ Error al sincronizar modelos:', err);
-});
+// --- Sincronización con Sequelize ---
+sequelize.sync({ force: process.env.FORCE_SYNC === 'true' })
+  .then(() => {
+    console.log('✅ Modelos sincronizados con la base de datos');
+    if (process.env.FORCE_SYNC === 'true') {
+      console.log('⚠️  ¡FORCE_SYNC activado! Las tablas fueron recreadas');
+    }
+  })
+  .catch(err => {
+    console.error('❌ Error al sincronizar modelos:', err.message);
+  });
 
-// Importación de rutas
+// --- Rutas ---
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const customerRoutes = require('./routes/customerRoute');
@@ -86,7 +86,6 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const cierreCajaRoutes = require('./routes/cierres');
 
-// Configuración de rutas
 app.use('/', authRoutes);
 app.use('/', dashboardRoutes);
 app.use('/customers', ensureAuthenticated, customerRoutes);
@@ -99,52 +98,49 @@ app.use('/reports', ensureAuthenticated, reportRoutes);
 app.use('/api/notifications', ensureAuthenticated, notificationRoutes);
 app.use('/cierre-caja', ensureAuthenticated, cierreCajaRoutes);
 
-// Ruta principal
+// --- Ruta raíz ---
 app.get('/', (req, res) => {
-  if (req.session.user) {
-    return res.redirect('/dashboard');
-  }
+  if (req.session.user) return res.redirect('/dashboard');
   res.redirect('/login');
 });
 
-// Manejo de errores 404
+// --- Error 404 ---
 app.use((req, res, next) => {
-  res.status(404).render('errors/404', {
-    layout: 'layouts/layout',
-    title: 'Página no encontrada'
-  });
+  res.status(404);
+  if (!res.headersSent) {
+    return res.render('errors/404', {
+      layout: 'layouts/layout',
+      title: 'Página no encontrada'
+    });
+  }
 });
 
-// Manejo de errores generales
+// --- Middleware de errores generales ---
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err.stack);
-  
-  // Guardar alerta de error
-  req.session.alerts = [{
-    type: 'error',
-    title: 'Error del sistema',
-    message: 'Ocurrió un error inesperado'
-  }];
-  
-  // Redirigir según el caso
-  if (req.originalUrl.startsWith('/api')) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+
+  if (!res.headersSent) {
+    if (req.originalUrl.startsWith('/api')) {
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    req.session.alerts = [{
+      type: 'error',
+      title: 'Error del sistema',
+      message: 'Ocurrió un error inesperado'
+    }];
+
+    return res.redirect(req.session.user ? '/dashboard' : '/login');
   }
-  
-  if (!req.session.user) {
-    return res.redirect('/login');
-  }
-  
-  res.redirect('/dashboard');
 });
 
-// Iniciar servidor
+// --- Iniciar servidor ---
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
 
-// Manejo de cierre elegante
+// --- Cierre elegante ---
 process.on('SIGTERM', () => {
   console.log('🛑 Recibido SIGTERM. Cerrando servidor...');
   server.close(() => {
