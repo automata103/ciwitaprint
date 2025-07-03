@@ -14,17 +14,18 @@ module.exports = {
 
       if (!user) {
         console.log('Usuario no encontrado para el username:', username);
-        return res.status(401).send('Nombre de usuario o contraseña incorrectos');
+        res.alertSwette('error', 'Nombre de usuario o contraseña incorrectos', 'Error de autenticación');
+        return res.redirect('/login');
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
 
       if (!isPasswordValid) {
         console.log('Contraseña incorrecta para el usuario:', username);
-        return res.status(401).send('Nombre de usuario o contraseña incorrectos');
+        res.alertSwette('error', 'Nombre de usuario o contraseña incorrectos', 'Error de autenticación');
+        return res.redirect('/login');
       }
 
-   // En tu controlador de login
       req.session.user = {
         id: user.id,
         username: user.username,
@@ -32,10 +33,12 @@ module.exports = {
         role: user.role
       };
 
+      res.alertSwette('success', `Bienvenido ${user.nombre_completo}`, 'Inicio de sesión exitoso');
       res.redirect('/dashboard');
     } catch (error) {
       console.error('Error en el controlador de login:', error);
-      res.status(500).send('Error al iniciar sesión');
+      res.alertSwette('error', 'Error al iniciar sesión', 'Error del sistema');
+      res.redirect('/login');
     }
   },
 
@@ -43,8 +46,10 @@ module.exports = {
     req.session.destroy(err => {
       if (err) {
         console.error(err);
-        return res.status(500).send('Error al cerrar sesión');
+        res.alertSwette('error', 'Error al cerrar sesión', 'Error del sistema');
+        return res.redirect('/dashboard');
       }
+      res.alertSwette('info', 'Has cerrado sesión correctamente', 'Sesión finalizada');
       res.redirect('/login');
     });
   }

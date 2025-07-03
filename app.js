@@ -8,6 +8,7 @@ const sequelize = require('./config/database');
 const expressLayouts = require('express-ejs-layouts');
 const User = require('./models/User'); // Asegúrate de importar tus modelos
 const Customer  = require('./models/Customer');
+const alertMiddleware = require('./middlewares/alertMiddleware');
 
 // Sincroniza los modelos con la base de datos
 sequelize.sync({ force: false }) // Cambia `force: true` si quieres que se recreen las tablas
@@ -45,7 +46,7 @@ app.use(function(req, res, next) {
   res.locals.user = req.session.user || null;
   next();
 });
-
+app.use(alertMiddleware);
 // Rutas
 const authRoutes = require('./routes/authRoutes');
 const customerRoutes = require('./routes/customerRoute');

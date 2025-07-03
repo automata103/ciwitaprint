@@ -1,0 +1,25 @@
+<!-- Versión personalizada de alerts.ejs -->
+<% if (alerts && alerts.length) { %>
+  <% alerts.forEach(alert => { %>
+    <div class="alert alert-<%= alert.type %> alert-custom alert-dismissible fade show" role="alert">
+      <div class="alert-icon">
+        <% if (alert.type === 'success') { %>
+          <i class="fas fa-check-circle"></i>
+        <% } else if (alert.type === 'error') { %>
+          <i class="fas fa-exclamation-circle"></i>
+        <% } else if (alert.type === 'warning') { %>
+          <i class="fas fa-exclamation-triangle"></i>
+        <% } else { %>
+          <i class="fas fa-info-circle"></i>
+        <% } %>
+      </div>
+      <div class="alert-content">
+        <% if (alert.title) { %><h4><%= alert.title %></h4><% } %>
+        <p><%= alert.message %></p>
+      </div>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  <% }); %>
+<% } %>

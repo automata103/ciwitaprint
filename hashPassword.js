@@ -30,8 +30,8 @@ async function crearUsuario({ username, nombre_completo, password, role }) {
 
 // Cambia estos datos para crear tu usuario nuevo
 crearUsuario({
-  username: 'yrodriguez',
-  nombre_completo: 'Soporte Tecnico',
-  password: 'Stream2011@',
+  username: 'ciwitaprint',
+  nombre_completo: 'Ciwita Print',
+  password: 'laCiwita23',
   role: 'administrador' // o el rol que quieras
 });
