@@ -6,7 +6,7 @@ module.exports = {
   showLoginForm: (req, res) => {
     res.render('auth/login', { layout: false });
   },
-
+// ssss
   login: async (req, res) => {
     try {
       const { username, password } = req.body;
