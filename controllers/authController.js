@@ -1,19 +1,21 @@
-// controllers/authController.js
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 
 module.exports = {
   showLoginForm: (req, res) => {
     try {
+      // Obtener alertas de la sesión
       const alerts = req.session.alerts || [];
       req.session.alerts = [];
+      
       res.render('auth/login', { 
         layout: false,
-        alerts
+        alerts,
+        currentPath: '/login'
       });
     } catch (error) {
-      console.error('Error showing login form:', error);
-      res.status(500).send('Internal Server Error');
+      console.error('Error al mostrar formulario de login:', error);
+      res.status(500).send('Error interno del servidor');
     }
   },
 
@@ -21,6 +23,7 @@ module.exports = {
     try {
       const { username, password } = req.body;
       
+      // Validación básica
       if (!username || !password) {
         req.session.alerts = [{
           type: 'error',
@@ -30,10 +33,10 @@ module.exports = {
         return res.redirect('/login');
       }
 
+      // Buscar usuario
       const user = await User.findOne({ where: { username } });
       
       if (!user) {
-        console.log('Usuario no encontrado:', username);
         req.session.alerts = [{
           type: 'error',
           message: 'Credenciales incorrectas',
@@ -42,10 +45,10 @@ module.exports = {
         return res.redirect('/login');
       }
 
+      // Verificar contraseña
       const isPasswordValid = await bcrypt.compare(password, user.password);
       
       if (!isPasswordValid) {
-        console.log('Contraseña incorrecta para:', username);
         req.session.alerts = [{
           type: 'error',
           message: 'Credenciales incorrectas',
@@ -54,7 +57,7 @@ module.exports = {
         return res.redirect('/login');
       }
 
-      // Establecer sesión de usuario
+      // Crear sesión
       req.session.user = {
         id: user.id,
         username: user.username,
@@ -62,19 +65,19 @@ module.exports = {
         role: user.role
       };
 
-      // Redirigir al dashboard con mensaje de éxito
+      // Redirigir con mensaje de éxito
       req.session.alerts = [{
         type: 'success',
         message: `Bienvenido ${user.nombre_completo}`,
-        title: 'Inicio exitoso'
+        title: 'Inicio de sesión exitoso'
       }];
       return res.redirect('/dashboard');
 
     } catch (error) {
-      console.error('Error durante el login:', error);
+      console.error('Error en el proceso de login:', error);
       req.session.alerts = [{
         type: 'error',
-        message: 'Ocurrió un error al iniciar sesión',
+        message: 'Error interno al iniciar sesión',
         title: 'Error del servidor'
       }];
       return res.redirect('/login');
@@ -82,7 +85,7 @@ module.exports = {
   },
 
   logout: (req, res) => {
-    req.session.destroy((err) => {
+    req.session.destroy(err => {
       if (err) {
         console.error('Error al cerrar sesión:', err);
         return res.redirect('/dashboard');

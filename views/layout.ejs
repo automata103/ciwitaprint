@@ -374,30 +374,23 @@
 <body>
   <!-- Sistema de Alertas -->
   <div class="alerts-container" id="alertsContainer">
-    <% if (alerts && alerts.length) { %>
+    <% if (typeof alerts !== 'undefined' && alerts.length) { %>
+    <div class="alerts-container">
       <% alerts.forEach(alert => { %>
         <div class="alert alert-<%= alert.type %> alert-dismissible fade show" 
-             role="alert" 
-             data-timeout="<%= alert.timeout %>"
-             style="<%= alert.position === 'top-right' ? 'top: 20px; right: 20px;' : 
-                    alert.position === 'top-left' ? 'top: 20px; left: 20px;' :
-                    alert.position === 'bottom-right' ? 'bottom: 20px; right: 20px;' :
-                    'bottom: 20px; left: 20px;' %>">
+             role="alert" data-timeout="<%= alert.timeout || 5000 %>">
           <div class="d-flex align-items-center">
-            <i class="bi bi-<%= alert.icon %> me-2"></i>
+            <i class="bi bi-<%= alert.icon || 'info-circle' %> me-2"></i>
             <div>
-              <% if (alert.title) { %>
-                <strong><%= alert.title %></strong><br>
-              <% } %>
+              <% if (alert.title) { %><strong><%= alert.title %></strong><br><% } %>
               <%= alert.message %>
             </div>
           </div>
-          <% if (alert.dismissible) { %>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          <% } %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       <% }); %>
-    <% } %>
+    </div>
+  <% } %>
   </div>
 
   <!-- Sidebar -->

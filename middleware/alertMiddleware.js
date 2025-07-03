@@ -1,12 +1,11 @@
-// middlewares/alertMiddleware.js
-module.exports = (req, res, next) => {
+module.exports = function(req, res, next) {
   // Inicializar alertas si no existen
   if (!req.session.alerts) {
     req.session.alerts = [];
   }
 
   // Método para agregar alertas
-  res.locals.alertSwette = (type, message, options = {}) => {
+  res.locals.alertSwette = function(type, message, options = {}) {
     const alert = {
       type,
       message,
@@ -19,18 +18,11 @@ module.exports = (req, res, next) => {
     req.session.alerts.push(alert);
   };
 
-  // Para rutas sin layout (como login) - guardar alertas en session
-  res.addAlert = (alertData) => {
-    req.session.alerts.push({
-      type: alertData.type,
-      message: alertData.message,
-      title: alertData.title || '',
-      icon: alertData.icon || getDefaultIcon(alertData.type),
-      dismissible: alertData.dismissible !== false,
-      timeout: alertData.timeout || 5000,
-      position: alertData.position || 'top-right'
-    });
-  };
+  // Pasar alertas a las vistas
+  res.locals.alerts = req.session.alerts || [];
+  
+  // Limpiar alertas después de mostrarlas
+  req.session.alerts = [];
 
   next();
 };
