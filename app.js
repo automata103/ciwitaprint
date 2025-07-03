@@ -35,6 +35,7 @@ app.use(session({
   cookie: { secure: false } // Configura esto a true si estás usando HTTPS
 }));
 
+app.use(alertMiddleware);
 // Middleware para pasar la información del usuario a las vistas
 app.use((req, res, next) => {
   res.locals.user = req.session.user;
@@ -46,7 +47,6 @@ app.use(function(req, res, next) {
   res.locals.user = req.session.user || null;
   next();
 });
-app.use(alertMiddleware);
 // Rutas
 const authRoutes = require('./routes/authRoutes');
 const customerRoutes = require('./routes/customerRoute');

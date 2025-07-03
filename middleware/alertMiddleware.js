@@ -5,25 +5,32 @@ module.exports = (req, res, next) => {
     req.session.alerts = [];
   }
 
-  // Método para agregar alertas con opciones adicionales
+  // Método para agregar alertas
   res.locals.alertSwette = (type, message, options = {}) => {
     const alert = {
       type,
       message,
       title: options.title || '',
       icon: options.icon || getDefaultIcon(type),
-      dismissible: options.dismissible !== false, // true por defecto
-      timeout: options.timeout || 5000, // 5 segundos por defecto
-      position: options.position || 'top-right' // top-right por defecto
+      dismissible: options.dismissible !== false,
+      timeout: options.timeout || 5000,
+      position: options.position || 'top-right'
     };
     req.session.alerts.push(alert);
   };
 
-  // Pasar alertas a las vistas
-  res.locals.alerts = req.session.alerts || [];
-  
-  // Limpiar alertas después de mostrarlas
-  req.session.alerts = [];
+  // Para rutas sin layout (como login) - guardar alertas en session
+  res.addAlert = (alertData) => {
+    req.session.alerts.push({
+      type: alertData.type,
+      message: alertData.message,
+      title: alertData.title || '',
+      icon: alertData.icon || getDefaultIcon(alertData.type),
+      dismissible: alertData.dismissible !== false,
+      timeout: alertData.timeout || 5000,
+      position: alertData.position || 'top-right'
+    });
+  };
 
   next();
 };

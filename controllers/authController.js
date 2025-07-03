@@ -4,13 +4,13 @@ const User = require('../models/User');
 
 module.exports = {
   showLoginForm: (req, res) => {
-    // Pasar las alertas a la vista aunque no use layout
+    // Obtener alertas de la sesión y limpiarlas
     const alerts = req.session.alerts || [];
     req.session.alerts = [];
     
     res.render('auth/login', { 
       layout: false,
-      alerts
+      alerts // Pasar alertas a la vista
     });
   },
 
@@ -20,7 +20,7 @@ module.exports = {
       const user = await User.findOne({ where: { username } });
 
       if (!user) {
-        console.log('Usuario no encontrado para el username:', username);
+        console.log('Usuario no encontrado:', username);
         req.session.alerts = [{
           type: 'error',
           message: 'Nombre de usuario o contraseña incorrectos',
@@ -33,7 +33,7 @@ module.exports = {
       const isPasswordValid = await bcrypt.compare(password, user.password);
 
       if (!isPasswordValid) {
-        console.log('Contraseña incorrecta para el usuario:', username);
+        console.log('Contraseña incorrecta para:', username);
         req.session.alerts = [{
           type: 'error',
           message: 'Nombre de usuario o contraseña incorrectos',
@@ -50,7 +50,6 @@ module.exports = {
         role: user.role
       };
 
-      // Redirigir al dashboard con alerta de éxito
       req.session.alerts = [{
         type: 'success',
         message: `Bienvenido ${user.nombre_completo}`,
@@ -60,7 +59,7 @@ module.exports = {
       }];
       return res.redirect('/dashboard');
     } catch (error) {
-      console.error('Error en el controlador de login:', error);
+      console.error('Error en login:', error);
       req.session.alerts = [{
         type: 'error',
         message: 'Error al iniciar sesión',
@@ -74,20 +73,21 @@ module.exports = {
   logout: (req, res) => {
     req.session.destroy(err => {
       if (err) {
-        console.error(err);
-        req.session.alerts = [{
+        console.error('Error al cerrar sesión:', err);
+        // Necesitamos crear nueva sesión para la alerta
+        req.session = { alerts: [{
           type: 'error',
           message: 'Error al cerrar sesión',
           title: 'Error del sistema'
-        }];
+        }]};
         return res.redirect('/dashboard');
       }
       // Crear nueva sesión solo para la alerta
-      req.session.alerts = [{
+      req.session = { alerts: [{
         type: 'info',
         message: 'Has cerrado sesión correctamente',
         title: 'Sesión finalizada'
-      }];
+      }]};
       return res.redirect('/login');
     });
   }
