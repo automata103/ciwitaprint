@@ -23,17 +23,20 @@ app.use(expressLayouts);
 app.set('layout', 'layouts/layout');
 
 // --- SESIONES ---
+// --- SESIONES ---
 const sessionConfig = {
   store: new PostgreSQLStore({
-    conString: process.env.DATABASE_URL || 
-      `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+    conObject: {
+      connectionString: process.env.DATABASE_URL || 
+        `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+      ssl: {
+        rejectUnauthorized: false
+      }
+    },
     createTableIfMissing: true,
-    pruneSessionInterval: 60 * 60, // Limpiar sesiones cada hora
-    ssl: {
-      rejectUnauthorized: false
-    }
+    pruneSessionInterval: 60 * 60 // Limpiar sesiones cada hora
   }),
-  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -42,6 +45,7 @@ const sessionConfig = {
     maxAge: 24 * 60 * 60 * 1000 // 1 día
   }
 };
+
 
 // Ajuste para desarrollo sin HTTPS
 if (process.env.NODE_ENV === 'development') {
