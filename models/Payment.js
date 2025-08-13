@@ -31,7 +31,8 @@ const Payment = sequelize.define('Payment', {
   tableName: 'payments',
   timestamps: true,                  // Habilita createdAt y updatedAt
   createdAt: 'created_at',           // Mapea correctamente a la columna real
-  updatedAt: 'updated_at'            // Idem
+  updatedAt: 'updated_at' ,          // Idem
+  underscored: true
 });
 
 module.exports = Payment;

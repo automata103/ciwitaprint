@@ -41,9 +41,10 @@ const Invoice = sequelize.define('Invoice', {
     allowNull: false,
     defaultValue: false
   },
-  fiscalnumber: {
+  fiscalNumber: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
+    field: 'fiscalnumber'
   },
   status: {
     type: DataTypes.STRING,
@@ -70,5 +71,18 @@ const Invoice = sequelize.define('Invoice', {
   createdAt: 'created_at',
   updatedAt: 'updated_at'
 });
+
+// Definición de relaciones
+Invoice.associate = (models) => {
+  Invoice.belongsTo(models.Customer, {
+    foreignKey: 'customerId',
+    as: 'customer'
+  });
+
+  Invoice.hasMany(models.Payment, {
+    foreignKey: 'invoiceId',
+    as: 'payments'
+  });
+};
 
 module.exports = Invoice;

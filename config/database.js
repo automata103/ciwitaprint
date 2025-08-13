@@ -1,6 +1,8 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
+const useSSL = process.env.DB_SSL === 'true';
+
 const sequelize = new Sequelize(
   process.env.DB_NAME,
   process.env.DB_USER,
@@ -10,16 +12,18 @@ const sequelize = new Sequelize(
     port: process.env.DB_PORT || 5432,
     dialect: process.env.DB_DIALECT || 'postgres',
     logging: false,
-    dialectOptions: {
-      ssl: {
-        require: process.env.DB_SSL === 'true',
-        rejectUnauthorized: false
-      }
-    }
+    dialectOptions: useSSL
+      ? {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false
+          }
+        }
+      : {}
   }
 );
 
-// Intento de conexión con reintentos (5 intentos)
+// Intento de conexión con reintentos
 const connectWithRetry = async (retries = 5, delay = 3000) => {
   for (let i = 0; i < retries; i++) {
     try {

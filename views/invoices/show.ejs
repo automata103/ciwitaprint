@@ -6,135 +6,77 @@
   <title>Factura de Venta - CiwitaPrint</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     /* Print-specific styles */
     @page {
-      size: 72mm auto; /* Standard thermal printer paper width */
+      size: 72mm auto;
       margin: 0;
     }
 
     body {
-      font-family: 'Roboto', sans-serif; /* Modern font */
-      background-color: #f0f2f5; /* Lighter background */
+      font-family: 'Roboto', sans-serif;
+      background-color: #f8f9fa;
       color: #333;
-      line-height: 1.6;
+      line-height: 1.5;
     }
 
-    /* Navbar styling */
-    .navbar {
-      background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%); /* Deeper blue gradient */
-      box-shadow: 0 4px 15px rgba(0,0,0,0.15); /* More pronounced shadow */
-    }
-
-    .navbar-brand {
-      font-weight: 700; /* Bolder */
-      letter-spacing: 0.8px;
-      color: #e0eaff !important; /* Lighter brand color */
-      display: flex;
-      align-items: center;
-    }
-    .navbar-brand i {
-      margin-right: 10px;
-      font-size: 1.2em;
-    }
-
-    .nav-link {
-      color: rgba(255,255,255,0.9) !important;
-      transition: all 0.3s ease;
-      margin: 0 8px; /* Increased margin */
-      border-radius: 6px; /* Slightly more rounded */
-      padding: 10px 18px !important; /* Larger clickable area */
-      font-weight: 500;
-    }
-
-    .nav-link:hover, .nav-link.active {
-      color: white !important;
-      background-color: rgba(255,255,255,0.2); /* Stronger hover effect */
-      transform: translateY(-1px); /* Slight lift on hover */
-    }
-
-    .nav-link i {
-      margin-right: 8px;
-    }
-
-    /* Main container for the invoice */
+    /* Invoice container */
     .invoice-container {
-      max-width: 72mm; /* Matches print width by default for thermal receipt-like display */
-      margin: 20px auto; /* More vertical space */
-      padding: 15px; /* More internal padding */
+      max-width: 72mm;
+      margin: 20px auto;
+      padding: 15px;
       background: white;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1); /* Softer, larger shadow */
-      border-radius: 12px; /* More rounded corners */
-      position: relative;
-      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      border-radius: 8px;
     }
 
-    /* Adjust invoice-container for larger screens */
-    @media (min-width: 768px) { /* For tablets and desktops */
+    @media (min-width: 768px) {
       .invoice-container {
-        max-width: 800px; /* Wider for better readability on larger screens */
-        padding: 30px;
-        margin-top: 30px;
-        margin-bottom: 30px;
+        max-width: 800px;
+        padding: 25px;
       }
     }
 
-    /* Invoice Header */
+    /* Header */
     .header {
       text-align: center;
-      margin-bottom: 20px; /* More space below header */
+      margin-bottom: 20px;
       padding-bottom: 15px;
-      border-bottom: 2px solid #eee; /* Subtle separator */
+      border-bottom: 1px solid #e0e0e0;
     }
 
     .header h2 {
       margin: 0;
-      font-size: 20px; /* Adjusted for mobile-first */
-      font-weight: 800;
-      color: #0f4c75;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    @media (min-width: 768px) {
-      .header h2 {
-        font-size: 28px; /* Larger on desktop */
-      }
+      font-size: 22px;
+      font-weight: 700;
+      color: #2c3e50;
+      letter-spacing: 0.5px;
     }
 
     .header p {
-      margin: 4px 0;
-      font-size: 11px;
+      margin: 5px 0;
+      font-size: 12px;
       color: #666;
-      line-height: 1.4;
     }
 
-    /* Details section (Invoice info & Client info) */
+    /* Details section */
     .details {
       margin-bottom: 20px;
       padding-bottom: 15px;
-      border-bottom: 1px dashed #ddd;
+      border-bottom: 1px solid #f0f0f0;
     }
 
     .details p {
-      margin: 6px 0;
+      margin: 5px 0;
       font-size: 13px;
-      color: #444;
-      display: flex; /* Use flex for key-value alignment */
+      display: flex;
       justify-content: space-between;
-      align-items: center;
     }
 
-    .details p strong {
-      color: #222;
-      flex-shrink: 0;
-      margin-right: 10px;
-    }
-    .details p span {
-      text-align: right;
-      flex-grow: 1;
-      word-break: break-word; /* Ensure long values wrap */
+    .details strong {
+      color: #444;
+      font-weight: 500;
     }
 
     /* Table styling */
@@ -142,188 +84,123 @@
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 20px;
-      background-color: #fdfdfd;
-      border: 1px solid #e9ecef;
-      display: block; /* Allows table to scroll horizontally on small screens */
-      overflow-x: auto; /* Adds horizontal scroll if content overflows */
-      white-space: nowrap; /* Prevents cell content from wrapping unnecessarily */
-    }
-
-    @media (min-width: 768px) {
-        table {
-            display: table; /* Revert to normal table display on larger screens */
-            overflow-x: visible;
-            white-space: normal;
-        }
-    }
-
-    th, td {
-      padding: 10px;
-      font-size: 12px;
-      text-align: left;
-      border-bottom: 1px solid #e9ecef;
-      vertical-align: top; /* Align content to the top in cells */
+      font-size: 13px;
     }
 
     th {
-      background-color: #e9ecef;
-      font-weight: 700;
-      color: #495057;
-      text-transform: uppercase;
-      padding-top: 12px;
-      padding-bottom: 12px;
+      background-color: #f5f5f5;
+      font-weight: 500;
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
     }
 
-    tr:last-child td {
-        border-bottom: none;
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #eee;
     }
 
-    /* Total amounts section */
+    /* Totals section */
     .total-summary {
-      margin-top: 20px;
-      margin-bottom: 20px;
+      margin: 20px 0;
       padding-top: 15px;
-      border-top: 1px dashed #ddd;
+      border-top: 1px solid #f0f0f0;
     }
 
     .total-summary table {
-      width: 100%;
-      font-size: 13px;
       margin-bottom: 0;
-      border: none;
-      display: table; /* Ensure this table behaves normally */
-      overflow-x: visible;
-      white-space: normal;
     }
 
     .total-summary td {
-      padding: 6px 0;
       border-bottom: none;
-    }
-
-    .total-summary td:first-child {
-      font-weight: 500;
-      color: #555;
+      padding: 5px 0;
     }
 
     .total-summary td:last-child {
       text-align: right;
-      font-weight: 600;
-      color: #333;
+      font-weight: 500;
     }
 
     .total-summary tr:last-child td {
-      font-size: 16px;
-      font-weight: 800;
-      color: #0f4c75;
-      padding-top: 10px;
-      border-top: 1px solid #ccc;
+      font-weight: 600;
+      color: #2c3e50;
+      padding-top: 8px;
+      border-top: 1px solid #ddd;
     }
 
     /* Payments section */
     .payments-section h3 {
-      font-size: 16px;
-      color: #0f4c75;
-      margin-top: 25px;
-      margin-bottom: 15px;
+      font-size: 15px;
+      color: #2c3e50;
+      margin: 20px 0 10px;
       text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .payments-section table {
-      margin-top: 10px;
+      font-weight: 500;
     }
 
     .payment-method-badge {
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
+      padding: 3px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 500;
     }
 
     .payment-cash {
-      background-color: #d4edda;
-      color: #155724;
+      background-color: #e8f5e9;
+      color: #2e7d32;
     }
 
     .payment-card {
-      background-color: #cce5ff;
-      color: #004085;
+      background-color: #e3f2fd;
+      color: #1565c0;
     }
 
     .payment-transfer {
-      background-color: #f8d7da;
-      color: #721c24;
+      background-color: #ffebee;
+      color: #c62828;
     }
+
     .payment-cheque {
-        background-color: #fff3cd;
-        color: #856404;
+      background-color: #fff8e1;
+      color: #ff8f00;
     }
 
     /* Footer */
     .invoice-footer {
       text-align: center;
       font-size: 11px;
-      margin-top: 25px;
-      padding-top: 15px;
       color: #777;
-      border-top: 1px dashed #ddd;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #f0f0f0;
     }
 
     /* Buttons */
     .btn-action-group {
-      display: grid;
-      gap: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
     }
 
     .btn-print-custom, .btn-back-custom {
       border: none;
-      border-radius: 8px;
-      padding: 12px 20px;
-      color: white;
-      font-weight: 600;
-      font-size: 1.0em; /* Adjusted for mobile-first */
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 100%; /* Full width on smaller screens */
+      border-radius: 6px;
+      padding: 10px 15px;
+      font-weight: 500;
+      transition: all 0.2s;
     }
-
-    @media (min-width: 768px) {
-      .btn-print-custom, .btn-back-custom {
-        font-size: 1.1em;
-        width: auto; /* Auto width on larger screens */
-      }
-      .btn-action-group {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Auto-fit buttons */
-      }
-    }
-
 
     .btn-print-custom {
-      background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-    }
-
-    .btn-print-custom:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      background-color: #28a745;
       color: white;
     }
 
     .btn-back-custom {
       background-color: #6c757d;
-    }
-
-    .btn-back-custom:hover {
-      background-color: #5a6268;
-      transform: translateY(-3px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
       color: white;
     }
 
-    /* Print media queries for optimal output */
+    /* Print styles */
     @media print {
       .no-print {
         display: none !important;
@@ -332,43 +209,23 @@
       body {
         width: 72mm;
         margin: 0;
-        font-size: 10px;
+        padding: 0;
         background: white;
-        -webkit-print-color-adjust: exact;
-        color-adjust: exact;
       }
 
       .invoice-container {
         box-shadow: none;
-        margin: 0;
-        padding: 10px;
         border-radius: 0;
+        padding: 10px;
       }
 
       .header h2 {
-        font-size: 20px;
+        font-size: 18px;
       }
 
       th, td {
         padding: 5px;
-        font-size: 10px;
-      }
-
-      .details p, .total-summary table, .payments-section table {
-          font-size: 10px;
-      }
-
-      .total-summary tr:last-child td {
-          font-size: 14px;
-      }
-
-      .payment-method-badge {
-          font-size: 9px;
-          padding: 2px 5px;
-      }
-
-      .invoice-footer {
-          font-size: 9px;
+        font-size: 11px;
       }
     }
   </style>
@@ -417,10 +274,9 @@
           <% }) %>
         <% } else { %>
           <tr>
-            <td colspan="4" class="text-center">Sin detalles de productos.</td>
+            <td colspan="4" style="text-align: center; color: #777;">Sin detalles de productos.</td>
           </tr>
         <% } %>
-
       </tbody>
     </table>
 
@@ -432,9 +288,9 @@
         <% if (invoice.labor && invoice.labor > 0) { %>
           <tr><td>Producto ROA:</td><td>RD$ <%= parseFloat(invoice.labor).toFixed(2) %></td></tr>
         <% } %>
-        <tr><td><strong>Total:</strong></td><td><strong>RD$ <%= parseFloat(invoice.total).toFixed(2) %></strong></td></tr>
+        <tr><td>Total:</td><td>RD$ <%= parseFloat(invoice.total).toFixed(2) %></td></tr>
         <tr><td>Pagado:</td><td>RD$ <%= parseFloat(totalPaid).toFixed(2) %></td></tr>
-        <tr><td><strong>Saldo Pendiente:</strong></td><td><strong>RD$ <%= parseFloat(balance).toFixed(2) %></strong></td></tr>
+        <tr><td>Saldo Pendiente:</td><td>RD$ <%= parseFloat(balance).toFixed(2) %></td></tr>
       </table>
     </div>
 
@@ -458,14 +314,18 @@
                     <%= payment.paymentMethod || 'No especificado' %>
                   </span>
                 </td>
-                <td><%= new Date(payment.createdAt).toLocaleDateString('es-DO', {day: '2-digit', month: '2-digit', year: 'numeric'}) %></td>
+                <td>
+                  <%= new Date(payment.created_at).toLocaleDateString('es-DO', {
+                      day: '2-digit', month: '2-digit', year: 'numeric'
+                    }) %>
+                </td>
               </tr>
             <% }) %>
           </tbody>
         </table>
       </div>
     <% } else { %>
-      <p style="text-align:center; font-style: italic; color: #777;">No se han registrado pagos para esta factura.</p>
+      <p style="text-align:center; color: #777; font-size: 13px;">No se han registrado pagos para esta factura.</p>
     <% } %>
 
     <div class="invoice-footer">
@@ -474,9 +334,10 @@
     </div>
   </div>
 
-  <div class="container mt-5 mb-5 no-print">
+  <div class="container no-print">
     <div class="row justify-content-center">
-      <div class="col-12 col-md-8 col-lg-6"> <div class="btn-action-group">
+      <div class="col-md-6">
+        <div class="btn-action-group">
           <button class="btn btn-print-custom" onclick="window.print()">
             <i class="fas fa-print me-2"></i> Imprimir Factura
           </button>
@@ -491,7 +352,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Dynamically add payment method classes for styling
       document.querySelectorAll('.payment-method-badge').forEach(el => {
         const method = el.textContent.trim().toLowerCase();
         if(method.includes('efectivo')) {
