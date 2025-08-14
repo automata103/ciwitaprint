@@ -3,368 +3,283 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Factura de Venta - CiwitaPrint</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <style>
-    /* Print-specific styles */
-    @page {
-      size: 72mm auto;
-      margin: 0;
+  <title>Factura - CiwitaPrint</title>
+<style>
+    @page { 
+       size: 80mm auto; 
+      margin: 4mm;
     }
-
     body {
-      font-family: 'Roboto', sans-serif;
-      background-color: #f8f9fa;
-      color: #333;
-      line-height: 1.5;
+      font-family: 'Arial', sans-serif;
+      font-size: 10px;
+      line-height: 1.2;
+      width: 65mm;
+      margin: 0 auto;
+      padding: 0;
+      color: #000;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
-
-    /* Invoice container */
-    .invoice-container {
-      max-width: 72mm;
-      margin: 20px auto;
-      padding: 15px;
-      background: white;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      border-radius: 8px;
+    .invoice-header, .invoice-info, .payment-section, .invoice-footer {
+      width: 100%;
+      box-sizing: border-box;
     }
-
-    @media (min-width: 768px) {
-      .invoice-container {
-        max-width: 800px;
-        padding: 25px;
-      }
-    }
-
-    /* Header */
-    .header {
+    .invoice-header {
       text-align: center;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #e0e0e0;
+      margin-bottom: 3mm;
+      padding-bottom: 2mm;
+      border-bottom: 1px dashed #000;
     }
-
-    .header h2 {
-      margin: 0;
-      font-size: 22px;
-      font-weight: 700;
-      color: #2c3e50;
+    .invoice-header h1 {
+      font-size: 14px;
+      font-weight: bold;
+      margin: 2mm 0;
       letter-spacing: 0.5px;
     }
-
-    .header p {
-      margin: 5px 0;
-      font-size: 12px;
-      color: #666;
+    .invoice-header p {
+      margin: 1mm 0;
+      font-size: 9px;
+      word-break: break-word;
     }
-
-    /* Details section */
-    .details {
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #f0f0f0;
+    .invoice-info {
+      margin-bottom: 3mm;
+      padding-bottom: 2mm;
+      border-bottom: 1px dashed #000;
     }
-
-    .details p {
-      margin: 5px 0;
-      font-size: 13px;
+    .info-row {
       display: flex;
       justify-content: space-between;
+      margin: 1mm 0;
+      flex-wrap: wrap;
     }
-
-    .details strong {
-      color: #444;
-      font-weight: 500;
+    .info-label {
+      font-weight: bold;
+      min-width: 20mm;
     }
-
-    /* Table styling */
-    table {
+    .info-value {
+      text-align: right;
+      flex-grow: 1;
+    }
+    .items-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 20px;
-      font-size: 13px;
+      margin-bottom: 3mm;
+      table-layout: fixed;
+      word-wrap: break-word;
     }
-
-    th {
-      background-color: #f5f5f5;
-      font-weight: 500;
-      padding: 8px 10px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
+    .items-table th, .items-table td {
+      padding: 1mm 0;
+      border-bottom: 1px dashed #ccc;
+      vertical-align: top;
+      font-size: 9px;
     }
-
-    td {
-      padding: 8px 10px;
-      border-bottom: 1px solid #eee;
+    .items-table th {
+      font-weight: bold;
+      border-bottom: 1px dashed #000;
     }
-
-    /* Totals section */
-    .total-summary {
-      margin: 20px 0;
-      padding-top: 15px;
-      border-top: 1px solid #f0f0f0;
+    .col-desc { width: 40%; }
+    .col-qty { width: 15%; text-align: center; }
+    .col-price { width: 20%; text-align: right; }
+    .col-total { width: 25%; text-align: right; font-weight: bold; }
+    .totals-table {
+      width: 100%;
+      margin-bottom: 3mm;
     }
-
-    .total-summary table {
-      margin-bottom: 0;
+    .totals-table td {
+      padding: 1mm 0;
+      font-size: 9px;
     }
-
-    .total-summary td {
-      border-bottom: none;
-      padding: 5px 0;
+    .label { font-weight: bold; }
+    .value { text-align: right; font-weight: bold; }
+    .grand-total {
+      border-top: 1px dashed #000;
+      border-bottom: 1px double #000;
+      font-size: 10px;
     }
-
-    .total-summary td:last-child {
-      text-align: right;
-      font-weight: 500;
+    .payment-section {
+      margin-bottom: 3mm;
+      padding-top: 2mm;
+      border-top: 1px dashed #000;
     }
-
-    .total-summary tr:last-child td {
-      font-weight: 600;
-      color: #2c3e50;
-      padding-top: 8px;
-      border-top: 1px solid #ddd;
-    }
-
-    /* Payments section */
-    .payments-section h3 {
-      font-size: 15px;
-      color: #2c3e50;
-      margin: 20px 0 10px;
+    .payment-section h3 {
       text-align: center;
-      font-weight: 500;
+      font-size: 9px;
+      margin: 1mm 0 2mm;
+      font-weight: bold;
     }
-
-    .payment-method-badge {
-      padding: 3px 6px;
-      border-radius: 3px;
-      font-size: 11px;
-      font-weight: 500;
+    .payment-method {
+      display: inline-block;
+      padding: 1mm 2mm;
+      border-radius: 2mm;
+      font-size: 8px;
+      font-weight: bold;
+      margin-right: 2mm;
     }
-
-    .payment-cash {
-      background-color: #e8f5e9;
-      color: #2e7d32;
-    }
-
-    .payment-card {
-      background-color: #e3f2fd;
-      color: #1565c0;
-    }
-
-    .payment-transfer {
-      background-color: #ffebee;
-      color: #c62828;
-    }
-
-    .payment-cheque {
-      background-color: #fff8e1;
-      color: #ff8f00;
-    }
-
-    /* Footer */
+    .payment-cash { background: #e8f5e9; color: #2e7d32; }
+    .payment-card { background: #e3f2fd; color: #1565c0; }
+    .payment-transfer { background: #fff3e0; color: #e65100; }
+    .payment-cheque { background: #fce4ec; color: #ad1457; }
     .invoice-footer {
       text-align: center;
-      font-size: 11px;
-      color: #777;
-      margin-top: 20px;
-      padding-top: 15px;
-      border-top: 1px solid #f0f0f0;
+      font-size: 8px;
+      margin-top: 4mm;
+      padding-top: 2mm;
+      border-top: 1px dashed #000;
     }
-
-    /* Buttons */
-    .btn-action-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 20px;
+    .barcode {
+      text-align: center;
+      margin: 2mm 0;
+      font-family: 'Libre Barcode 128', cursive;
+      font-size: 24px;
     }
-
-    .btn-print-custom, .btn-back-custom {
-      border: none;
-      border-radius: 6px;
-      padding: 10px 15px;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-
-    .btn-print-custom {
-      background-color: #28a745;
-      color: white;
-    }
-
-    .btn-back-custom {
-      background-color: #6c757d;
-      color: white;
-    }
-
-    /* Print styles */
     @media print {
-      .no-print {
-        display: none !important;
-      }
-
-      body {
-        width: 72mm;
+      .no-print { display: none !important; }
+      body { 
+        width: 65mm !important;
         margin: 0;
         padding: 0;
-        background: white;
-      }
-
-      .invoice-container {
-        box-shadow: none;
-        border-radius: 0;
-        padding: 10px;
-      }
-
-      .header h2 {
-        font-size: 18px;
-      }
-
-      th, td {
-        padding: 5px;
-        font-size: 11px;
       }
     }
   </style>
 </head>
 <body>
+  <div class="invoice-header">
+    <h1>CIWITAPRINT</h1>
+    <p>RNC: 133346834</p>
+    <p>C/ Porvenir Barrio el Progreso #46, Andrés Boca Chica</p>
+    <p>ciwitaprint@gmail.com</p>
+    <p>809-708-6063</p>
+  </div>
 
-  <div class="invoice-container">
-    <div class="header">
-      <h2>CiwitaPrint</h2>
-      <p>RNC: 133346834</p>
-      <p>C/ Porvenir Barrio el Progreso #46, Andrés Boca Chica</p>
-      <p>809-708-6063 | ciwitaprint@gmail.com</p>
+  <div class="invoice-info">
+    <div class="info-row">
+      <span class="info-label">Factura #:</span>
+      <span class="info-value"><%= invoice.id %></span>
     </div>
-
-    <div class="details">
-      <p><strong>Factura #:</strong> <span><%= invoice.id %></span></p>
-
-      <% if (invoice.fiscalNumber && invoice.fiscalNumber.trim() !== '') { %>
-        <p><strong>NCF:</strong> <span><%= invoice.fiscalNumber %></span></p>
-      <% } %>
-
-      <p><strong>Fecha:</strong> 
-        <span><%= new Date(invoice.date).toLocaleDateString('es-DO', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></span>
-      </p>
-      <p><strong>Cliente:</strong> <span><%= invoice.Customer ? invoice.Customer.name : 'Consumidor Final' %></span></p>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Producto</th>
-          <th>Cant.</th>
-          <th>Precio</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if (invoice.details && invoice.details.length > 0) { %>
-          <% invoice.details.forEach(detail => { %>
-            <tr>
-              <td><%= detail.product ? detail.product.name : 'Producto no disponible' %></td>
-              <td><%= detail.quantity %></td>
-              <td>RD$ <%= parseFloat(detail.price).toFixed(2) %></td>
-              <td>RD$ <%= (detail.quantity * detail.price).toFixed(2) %></td>
-            </tr>
-          <% }) %>
-        <% } else { %>
-          <tr>
-            <td colspan="4" style="text-align: center; color: #777;">Sin detalles de productos.</td>
-          </tr>
-        <% } %>
-      </tbody>
-    </table>
-
-    <div class="total-summary">
-      <table>
-        <tr><td>Subtotal:</td><td>RD$ <%= parseFloat(invoice.subtotal).toFixed(2) %></td></tr>
-        <tr><td>ITBIS:</td><td>RD$ <%= parseFloat(invoice.itbis).toFixed(2) %></td></tr>
-        <tr><td>Descuento:</td><td>RD$ <%= parseFloat(invoice.discount).toFixed(2) %></td></tr>
-        <% if (invoice.labor && invoice.labor > 0) { %>
-          <tr><td>Producto ROA:</td><td>RD$ <%= parseFloat(invoice.labor).toFixed(2) %></td></tr>
-        <% } %>
-        <tr><td>Total:</td><td>RD$ <%= parseFloat(invoice.total).toFixed(2) %></td></tr>
-        <tr><td>Pagado:</td><td>RD$ <%= parseFloat(totalPaid).toFixed(2) %></td></tr>
-        <tr><td>Saldo Pendiente:</td><td>RD$ <%= parseFloat(balance).toFixed(2) %></td></tr>
-      </table>
-    </div>
-
-    <% if (payments && payments.length > 0) { %>
-      <div class="payments-section">
-        <h3>Pagos Registrados</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Monto</th>
-              <th>Método</th>
-              <th>Fecha</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% payments.forEach(payment => { %>
-              <tr>
-                <td>RD$ <%= parseFloat(payment.amount).toFixed(2) %></td>
-                <td>
-                  <span class="payment-method-badge payment-<%= payment.paymentMethod.toLowerCase() %>">
-                    <%= payment.paymentMethod || 'No especificado' %>
-                  </span>
-                </td>
-                <td>
-                  <%= new Date(payment.created_at).toLocaleDateString('es-DO', {
-                      day: '2-digit', month: '2-digit', year: 'numeric'
-                    }) %>
-                </td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
+    <% if (invoice.fiscalNumber && invoice.fiscalNumber.trim() !== '') { %>
+      <div class="info-row">
+        <span class="info-label">NCF:</span>
+        <span class="info-value"><%= invoice.fiscalNumber %></span>
       </div>
-    <% } else { %>
-      <p style="text-align:center; color: #777; font-size: 13px;">No se han registrado pagos para esta factura.</p>
     <% } %>
-
-    <div class="invoice-footer">
-      <p>¡Gracias por preferir nuestros servicios!</p>
-      <p>CiwitaPrint - Siempre innovando.</p>
+    <div class="info-row">
+      <span class="info-label">Fecha:</span>
+      <span class="info-value">
+        <%= new Date(invoice.date).toLocaleDateString('es-DO', { 
+          day: '2-digit', month: '2-digit', year: 'numeric' 
+        }) %>
+      </span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Cliente:</span>
+      <span class="info-value"><%= invoice.customer ? invoice.customer.name : 'Consumidor Final' %></span>
     </div>
   </div>
 
-  <div class="container no-print">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="btn-action-group">
-          <button class="btn btn-print-custom" onclick="window.print()">
-            <i class="fas fa-print me-2"></i> Imprimir Factura
-          </button>
-          <a href="/invoices" class="btn btn-back-custom">
-            <i class="fas fa-arrow-left me-2"></i> Volver a Facturas
-          </a>
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th class="col-desc">Producto</th>
+        <th class="col-qty">Cant.</th>
+        <th class="col-price">Precio</th>
+        <th class="col-total">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (invoice.details && invoice.details.length > 0) { %>
+        <% invoice.details.forEach(detail => { %>
+          <tr>
+            <td class="col-desc"><%= detail.product ? detail.product.name : 'Producto' %></td>
+            <td class="col-qty"><%= detail.quantity %></td>
+            <td class="col-price">RD$ <%= parseFloat(detail.price).toFixed(2) %></td>
+            <td class="col-total">RD$ <%= (detail.quantity * detail.price).toFixed(2) %></td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr>
+          <td colspan="4" style="text-align: center;">No hay productos</td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+
+  <table class="totals-table">
+    <tr>
+      <td class="label">Subtotal:</td>
+      <td class="value">RD$ <%= parseFloat(invoice.subtotal).toFixed(2) %></td>
+    </tr>
+    <tr>
+      <td class="label">ITBIS (18%):</td>
+      <td class="value">RD$ <%= parseFloat(invoice.itbis).toFixed(2) %></td>
+    </tr>
+    <tr>
+      <td class="label">Descuento:</td>
+      <td class="value">RD$ <%= parseFloat(invoice.discount).toFixed(2) %></td>
+    </tr>
+    <% if (invoice.labor && invoice.labor > 0) { %>
+      <tr>
+        <td class="label">Servicio ROA:</td>
+        <td class="value">RD$ <%= parseFloat(invoice.labor).toFixed(2) %></td>
+      </tr>
+    <% } %>
+    <tr class="grand-total">
+      <td class="label">TOTAL:</td>
+      <td class="value">RD$ <%= parseFloat(invoice.total).toFixed(2) %></td>
+    </tr>
+    <tr>
+      <td class="label">Pagado:</td>
+      <td class="value">RD$ <%= parseFloat(totalPaid).toFixed(2) %></td>
+    </tr>
+    <tr>
+      <td class="label">Saldo:</td>
+      <td class="value">RD$ <%= parseFloat(balance).toFixed(2) %></td>
+    </tr>
+  </table>
+
+  <% if (payments && payments.length > 0) { %>
+    <div class="payment-section">
+      <h3>PAGOS REGISTRADOS</h3>
+      <% payments.forEach(payment => { %>
+        <div class="info-row" style="margin-bottom: 2mm;">
+          <span class="info-label">
+            <span class="payment-method payment-<%= payment.paymentMethod.toLowerCase() %>">
+              <%= payment.paymentMethod %>
+            </span>
+          </span>
+          <span class="info-value">
+            RD$ <%= parseFloat(payment.amount).toFixed(2) %> - 
+            <%= new Date(payment.created_at).toLocaleDateString('es-DO', { 
+              day: '2-digit', month: '2-digit', year: 'numeric' 
+            }) %>
+          </span>
         </div>
-      </div>
+      <% }) %>
     </div>
+  <% } %>
+
+ <div class="barcode">😊</div>
+
+
+  <div class="invoice-footer">
+    <p>¡Gracias por su preferencia!</p>
+    <p>Factura generada electrónicamente</p>
+    <p>Validez fiscal: 30 días</p>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      document.querySelectorAll('.payment-method-badge').forEach(el => {
-        const method = el.textContent.trim().toLowerCase();
-        if(method.includes('efectivo')) {
-          el.classList.add('payment-cash');
-        } else if(method.includes('tarjeta')) {
-          el.classList.add('payment-card');
-        } else if(method.includes('transferencia')) {
-          el.classList.add('payment-transfer');
-        } else if(method.includes('cheque')) {
-          el.classList.add('payment-cheque');
-        }
-      });
-    });
-  </script>
+   <script>
+  function imprimirYCerrar() {
+    window.print();
+    setTimeout(() => {
+      window.location.href = '/invoices'; // Cambia por tu ruta real
+    }, 300);
+  }
+</script>
+
+<div class="no-print" style="text-align: center; margin-top: 10px;">
+  <button onclick="imprimirYCerrar()" 
+    style="padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+    Imprimir Factura
+  </button>
+</div>
 </body>
 </html>

@@ -83,89 +83,103 @@ module.exports = {
   },
 
   // Crear una nueva factura
-  create: async (req, res) => {
-    try {
-      const { customerId, products, subtotal, discount, labor, comments, fiscalReceipt } = req.body;
+// Crear una nueva factura
+// Crear una nueva factura
+create: async (req, res) => {
+  try {
+    const { customerId, products, subtotal, discount, labor, comments, fiscalReceipt } = req.body;
 
-      if (!Array.isArray(products) || products.length === 0) {
-        return res.status(400).send('No se proporcionaron productos válidos');
-      }
+    if (!Array.isArray(products) || products.length === 0) {
+      return res.status(400).send('No se proporcionaron productos válidos');
+    }
 
-      const numericSubtotal = parseFloat(subtotal || 0);
-      const numericDiscount = parseFloat(discount || 0);
-      const numericLabor = parseFloat(labor || 0);
-      const itbis = parseFloat((numericSubtotal * 0.18).toFixed(2));
-      const total = parseFloat((numericSubtotal + numericLabor - numericDiscount + itbis).toFixed(2));
+    const numericSubtotal = parseFloat(subtotal || 0);
+    const numericDiscount = parseFloat(discount || 0);
+    const numericLabor = parseFloat(labor || 0);
 
-      const isZeroInvoice = total === 0;
-      let fiscalNumber = null;
+    // Impuesto solo si fiscalReceipt = true
+    let itbis = 0;
+    if (fiscalReceipt === 'true') {
+      itbis = parseFloat((numericSubtotal * 0.18).toFixed(2));
+    }
 
-      if (fiscalReceipt === 'true') {
-        const lastInvoice = await Invoice.findOne({
-          where: { fiscalNumber: { [Op.ne]: null } },
-          order: [['fiscalNumber', 'DESC']]
-        });
+    const total = parseFloat((numericSubtotal + numericLabor - numericDiscount + itbis).toFixed(2));
+    const isZeroInvoice = total === 0;
 
-        let lastFiscalNumber = 0;
-        if (lastInvoice && lastInvoice.fiscalNumber) {
-          const lastNumber = lastInvoice.fiscalNumber.substring(2);
-          lastFiscalNumber = parseInt(lastNumber, 10);
-        }
-        fiscalNumber = `EB0${(lastFiscalNumber + 1).toString().padStart(10, '0')}`;
-      }
-
-      const invoice = await Invoice.create({
-        customerId,
-        subtotal: numericSubtotal,
-        itbis,
-        discount: numericDiscount,
-        labor: numericLabor,
-        total,
-        comments,
-        fiscalReceipt: fiscalReceipt === 'true',
-        fiscalNumber,
-        date: new Date(),
-        status: isZeroInvoice ? 'Pagada' : 'Pendiente',
-        isPaid: isZeroInvoice,
-        paymentDate: isZeroInvoice ? new Date() : null,
-        paymentMethod: isZeroInvoice ? 'Sin Cargo' : null
+    // Generar NCF si fiscalReceipt es true
+    let fiscalNumber = null;
+    if (fiscalReceipt === 'true') {
+      const lastInvoice = await Invoice.findOne({
+        where: { fiscalNumber: { [Op.ne]: null } },
+        order: [
+          [Sequelize.literal("CAST(SUBSTRING(fiscalNumber, 4) AS INTEGER)"), 'DESC']
+        ]
       });
 
-      for (const product of products) {
-        await InvoiceDetail.create({
-          invoiceId: invoice.id,
-          productId: product.id,
-          quantity: product.quantity,
-          price: product.price
-        });
+      let lastFiscalNumber = 14; // para que empiece en 15 si no hay facturas
+      if (lastInvoice && lastInvoice.fiscalNumber) {
+        const lastNumber = lastInvoice.fiscalNumber.replace(/^B01/, '');
+        lastFiscalNumber = parseInt(lastNumber, 10);
       }
 
-      if (isZeroInvoice) {
-        await Payment.create({
-          invoiceId: invoice.id,
-          amount: 0,
-          paymentMethod: 'Sin Cargo',
-          reference: 'Pago automático por factura con total cero'
-        });
-
-        await AccountsReceivable.create({
-          invoiceId: invoice.id,
-          customerId: invoice.customerId,
-          amount_due: 0,
-          amount_paid: 0,
-          balance: 0,
-          status: 'Pagado',
-          payment_date: new Date(),
-          payment_method: 'Sin Cargo'
-        });
-      }
-
-      res.redirect('/invoices');
-    } catch (error) {
-      console.error('Error al crear factura:', error);
-      res.status(500).send('Error al crear factura: ' + error.message);
+      fiscalNumber = `B01${(lastFiscalNumber + 1).toString().padStart(8, '0')}`;
     }
-  },
+
+    // Crear factura
+    const invoice = await Invoice.create({
+      customerId,
+      subtotal: numericSubtotal,
+      itbis,
+      discount: numericDiscount,
+      labor: numericLabor,
+      total,
+      comments,
+      fiscalReceipt: fiscalReceipt === 'true',
+      fiscalNumber,
+      date: new Date(),
+      status: isZeroInvoice ? 'Pagada' : 'Pendiente',
+      isPaid: isZeroInvoice,
+      paymentDate: isZeroInvoice ? new Date() : null,
+      paymentMethod: isZeroInvoice ? 'Sin Cargo' : null
+    });
+
+    // Guardar detalles
+    for (const product of products) {
+      await InvoiceDetail.create({
+        invoiceId: invoice.id,
+        productId: product.id,
+        quantity: product.quantity,
+        price: product.price
+      });
+    }
+
+    // Si es factura con total cero, crear pago y cuenta por cobrar
+    if (isZeroInvoice) {
+      await Payment.create({
+        invoiceId: invoice.id,
+        amount: 0,
+        paymentMethod: 'Sin Cargo',
+        reference: 'Pago automático por factura con total cero'
+      });
+
+      await AccountsReceivable.create({
+        invoiceId: invoice.id,
+        customerId: invoice.customerId,
+        amount_due: 0,
+        amount_paid: 0,
+        balance: 0,
+        status: 'Pagado',
+        payment_date: new Date(),
+        payment_method: 'Sin Cargo'
+      });
+    }
+
+    res.redirect('/invoices');
+  } catch (error) {
+    console.error('Error al crear factura:', error);
+    res.status(500).send('Error al crear factura: ' + error.message);
+  }
+},
 
   // Mostrar detalles de una factura
   show: async (req, res) => {
