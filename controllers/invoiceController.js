@@ -182,44 +182,78 @@ create: async (req, res) => {
 },
 
   // Mostrar detalles de una factura
-  show: async (req, res) => {
-    try {
-      const invoice = await Invoice.findByPk(req.params.id, {
-        include: [
-          { model: Customer, as: 'customer' },
-          { model: Payment, as: 'payments' },
-          {
-            model: InvoiceDetail,
-            as: 'details',
-            include: [
-              { model: Product, as: 'product' }
-            ]
-          }
-        ]
-      });
+ show: async (req, res) => {
+  try {
+    const invoice = await Invoice.findByPk(req.params.id, {
+      include: [
+        { 
+          model: Customer, 
+          as: 'customer',
+          attributes: [
+            'id', 
+            'name', 
+            'type', 
+            'email', 
+            'phone', 
+            'address',
+            'empresa_nombre', 
+            'rcn', 
+            'empresa_telefono',
+            'empresa_correo',
+            'empresa_direccion',
+            'contacto_nombre',
+            'contacto_telefono',
+            'contacto_cargo',
+            'contacto_correo'
+          ]
+        },
+        { model: Payment, as: 'payments' },
+        {
+          model: InvoiceDetail,
+          as: 'details',
+          include: [
+            { model: Product, as: 'product' }
+          ]
+        }
+      ]
+    });
 
-      if (!invoice) {
-        return res.status(404).send('Factura no encontrada');
-      }
-
-      const payments = Array.isArray(invoice.payments) ? invoice.payments : [];
-      const totalPaid = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
-      const balance = parseFloat(invoice.total - totalPaid).toFixed(2);
-
-      res.render('invoices/show', {
-        invoice,
-        payments,
-        totalPaid: totalPaid.toFixed(2),
-        balance,
-        layout: false,
-        title: `Factura #${invoice.id} | CiwitaPrint`,
-        currentPath: `/invoices/${invoice.id}`
-      });
-    } catch (error) {
-      console.error('Error al obtener factura:', error);
-      res.status(500).send('Error al obtener factura: ' + error.message);
+    if (!invoice) {
+      return res.status(404).send('Factura no encontrada');
     }
-  },
+
+    const payments = Array.isArray(invoice.payments) ? invoice.payments : [];
+    const totalPaid = payments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+    const balance = parseFloat(invoice.total - totalPaid).toFixed(2);
+
+    // Preparar datos adicionales para la vista
+    const clientData = {
+      isCompany: invoice.customer && invoice.customer.type === 'Empresa',
+      companyName: invoice.customer?.empresa_nombre || '',
+      rcn: invoice.customer?.rcn || '',
+      contactName: invoice.customer?.contacto_nombre || '',
+      contactPhone: invoice.customer?.contacto_telefono || '',
+      contactPosition: invoice.customer?.contacto_cargo || '',
+      companyPhone: invoice.customer?.empresa_telefono || '',
+      companyEmail: invoice.customer?.empresa_correo || '',
+      companyAddress: invoice.customer?.empresa_direccion || ''
+    };
+
+    res.render('invoices/show', {
+      invoice,
+      payments,
+      totalPaid: totalPaid.toFixed(2),
+      balance,
+      clientData,
+      layout: false,
+      title: `Factura #${invoice.id} | CiwitaPrint`,
+      currentPath: `/invoices/${invoice.id}`
+    });
+  } catch (error) {
+    console.error('Error al obtener factura:', error);
+    res.status(500).send('Error al obtener factura: ' + error.message);
+  }
+},
 
   // Mostrar formulario para registrar pago
   showPayInvoice: async (req, res) => {

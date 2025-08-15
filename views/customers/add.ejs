@@ -157,6 +157,60 @@
                     <option value="VIP">VIP</option>
                   </select>
                 </div>
+
+                <!-- Campos adicionales para Empresa -->
+                <div id="empresaFields" style="display: none;">
+                  <hr>
+                  <h5 class="text-primary">Datos de la Empresa</h5>
+                  
+                  <div class="mb-3">
+                    <label for="empresa_nombre" class="form-label required-field">Nombre de Empresa</label>
+                    <input type="text" class="form-control" id="empresa_nombre" name="empresa_nombre" placeholder="Ej: Soluciones XYZ SRL">
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="rcn" class="form-label required-field">RCN</label>
+                    <input type="text" class="form-control" id="rcn" name="rcn" placeholder="Registro comercial o número fiscal">
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="empresa_telefono" class="form-label">Teléfono</label>
+                    <input type="text" class="form-control" id="empresa_telefono" name="empresa_telefono" placeholder="809-555-0000">
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="empresa_correo" class="form-label">Correo</label>
+                    <input type="email" class="form-control" id="empresa_correo" name="empresa_correo" placeholder="empresa@ejemplo.com">
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="empresa_direccion" class="form-label">Dirección</label>
+                    <textarea class="form-control" id="empresa_direccion" name="empresa_direccion" rows="2"></textarea>
+                  </div>
+
+                  <hr>
+                  <h5 class="text-primary">Contacto</h5>
+
+                  <div class="mb-3">
+                    <label for="contacto_nombre" class="form-label">Nombre de contacto</label>
+                    <input type="text" class="form-control" id="contacto_nombre" name="contacto_nombre" placeholder="Ej: Juan Pérez">
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="contacto_telefono" class="form-label">Teléfono contacto</label>
+                    <input type="text" class="form-control" id="contacto_telefono" name="contacto_telefono" placeholder="809-555-9999">
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="contacto_cargo" class="form-label">Cargo</label>
+                    <input type="text" class="form-control" id="contacto_cargo" name="contacto_cargo" placeholder="Ej: Gerente de Ventas">
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="contacto_correo" class="form-label">Correo contacto</label>
+                    <input type="email" class="form-control" id="contacto_correo" name="contacto_correo" placeholder="gerent@empresa.com">
+                  </div>
+                </div>
                 
                 <div class="mb-4">
                   <label for="address" class="form-label">Dirección</label>
@@ -232,5 +286,15 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.getElementById('type').addEventListener('change', function () {
+      const empresaFields = document.getElementById('empresaFields');
+      if (this.value === 'Empresa') {
+        empresaFields.style.display = 'block';
+      } else {
+        empresaFields.style.display = 'none';
+      }
+    });
+  </script>
 </body>
 </html>

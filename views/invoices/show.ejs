@@ -143,13 +143,19 @@
   </style>
 </head>
 <body>
-  <div class="invoice-header">
+   <div class="invoice-header">
     <h1>CIWITAPRINT</h1>
-    <p>RNC: 133346834</p>
-    <p>C/ Porvenir Barrio el Progreso #46, Andrés Boca Chica</p>
-    <p>ciwitaprint@gmail.com</p>
-    <p>809-708-6063</p>
+    <% if (invoice.fiscalNumber && invoice.fiscalNumber.trim() !== '') { %>
+      <div class="company-info">
+        <p>RNC: 133346834</p>
+        <p>C/ Porvenir Barrio el Progreso #46, Andrés Boca Chica</p>
+        <p>ciwitaprint@gmail.com</p>
+        <p>809-708-6063</p>
+      </div>
+    <% } %>
   </div>
+
+
 
   <div class="invoice-info">
     <div class="info-row">
@@ -175,7 +181,36 @@
       <span class="info-value"><%= invoice.customer ? invoice.customer.name : 'Consumidor Final' %></span>
     </div>
   </div>
-
+  <% if (invoice.fiscalNumber && invoice.fiscalNumber.trim() !== '' && invoice.customer && invoice.customer.type === 'Empresa') { %>
+    <div class="client-company-info">
+      <p class="info-title">DATOS DE LA EMPRESA</p>
+      <div class="info-row">
+        <span class="info-label">Empresa:</span>
+        <span class="info-value"><% if (invoice.customer.empresa_nombre) { %> <%= invoice.customer.empresa_nombre %><% } %></span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">RNC:</span>
+        <span class="info-value"><% if (invoice.customer.rcn) { %> <%= invoice.customer.rcn %><% } %></span>
+    </div>
+    <div class="info-row">
+         <span class="info-label">Contacto:</span>
+        <span class="info-value"><% if (invoice.customer.contacto_nombre) { %> <%= invoice.customer.contacto_nombre %><% } %></span>
+    </div>
+       <div class="info-row">
+         <span class="info-label">Teléfono:</span>
+        <span class="info-value"><% if (invoice.customer.contacto_telefono) { %> <%= invoice.customer.contacto_telefono %><% } %></span>
+    </div>
+      <div class="info-row">
+         <span class="info-label">Cargo:</span>
+        <span class="info-value"><% if (invoice.customer.contacto_cargo) { %> <%= invoice.customer.contacto_cargo %><% } %></span>
+    </div>
+      
+      
+      
+      
+    </div>
+  <% } %>
+  <hr>
   <table class="items-table">
     <thead>
       <tr>

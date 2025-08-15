@@ -22,6 +22,47 @@ const Customer = sequelize.define('Customer', {
     type: DataTypes.TEXT,
     allowNull: true
   },
+
+  // Campos de empresa
+  empresa_nombre: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  rcn: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  empresa_telefono: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  empresa_correo: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  empresa_direccion: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+
+  // Campos de contacto
+  contacto_nombre: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  contacto_telefono: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  contacto_cargo: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  contacto_correo: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+
   createdAt: {
     type: DataTypes.DATE,
     field: 'created_at'
